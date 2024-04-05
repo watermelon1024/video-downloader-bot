@@ -7,7 +7,7 @@ import logging
 import sys
 from datetime import timedelta
 
-from loguru._logger import Core, Logger  # pylint: disable=wrong-import-position
+from loguru._logger import Core, Logger
 
 
 class Logging:
@@ -37,7 +37,8 @@ class Logging:
             patchers=[],
             extra={},
         )
-        self._logger.disable("py-cord")
+        self._logger.disable("discord")
+        self._logger.disable("aiosqlite")
         self._logger.add(sys.stderr, level=level, diagnose=False, enqueue=True, format=format)
         self._logger.add(
             "./logs/{time:YYYY-MM-DD_HH-mm-ss_SSS}.log",

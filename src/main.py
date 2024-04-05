@@ -22,21 +22,21 @@ class Bot(discord.AutoShardedBot):
     def __init__(self, log_webhook: Optional[str] = None) -> None:
         self._client_ready = False
         self.config = Config()
+        self.debug_mode: bool = self.config["bot"]["debug-mode"]
         self.logger = Logging(
             retention=self.config["log"]["retention"],
-            debug_mode=self.config["bot"]["debug-mode"],
+            debug_mode=self.debug_mode,
             format=self.config["log"]["format"],
         ).get_logger()
         logging.basicConfig(
             handlers=[InterceptHandler(self.logger)],
-            level=0 if self.config["bot"]["debug-mode"] else logging.INFO,
+            level=0 if self.debug_mode else logging.INFO,
             force=True,
         )
         self.log_webhook = log_webhook
         self.database = Database(self.config["database"]["path"])
 
         intents = discord.Intents.default()
-        intents.members = True
         super().__init__(owner_ids=self.config["bot"]["owners"], intents=intents)
 
         for k, v in self.load_extension("src.cogs", recursive=True, store=True).items():

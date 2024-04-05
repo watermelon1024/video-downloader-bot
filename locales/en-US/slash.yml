@@ -1,3 +1,31 @@
+download:
+  name: "download"
+  description: "Download vudio/audio form url"
+  option:
+    url:
+      name: "url"
+      description: "The url you'd like to download"
+    video_format:
+      name: "video-format"
+      description: "Video fromat"
+    audio_format:
+      name: "audio-format"
+      description: "Audio format"
+    audio_quality:
+      name: "audio-quality"
+      description: "Audio quality, ex: '192' ('k' is not needed)"
+    audio_only:
+      name: "audio-only"
+      description: "Only download audio"
+    other:
+      name: "other"
+      description: "Other options"
+  response:
+    start: "Downloading..."
+    success: "Download Successfully!"
+    too_large: "File too too large({size}), cannot upload."
+    error: "Download failed, error ID：```{err_id}```"
+
 error_log:
   name: "error-log"
   description: "Get the error log (dev only)"
@@ -12,4 +40,3 @@ error_log:
     success: "Error occurred at"
   hint_message: "Oops! An error occurred.\n\
     Please use the button below to contact us and provide the following error ID.```{err_id}```"
-

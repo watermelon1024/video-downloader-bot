@@ -1,3 +1,31 @@
+download:
+  name: "下載"
+  description: "下載影片/音訊"
+  option:
+    url:
+      name: "網址"
+      description: "要下載的網址"
+    video_format:
+      name: "影片格式"
+      description: "影片格式"
+    audio_format:
+      name: "音訊格式"
+      description: "音訊格式"
+    audio_quality:
+      name: "音訊品質"
+      description: "音訊品質, 例: '192' (不需輸入'k')"
+    audio_only:
+      name: "僅音訊"
+      description: "僅下載音訊"
+    other:
+      name: "其他"
+      description: "其他選項"
+  response:
+    start: "下載中..."
+    success: "下載成功！"
+    too_large: "檔案過太({size})，無法上傳。"
+    error: "下載失敗，錯誤 ID：```{err_id}```"
+
 error_log:
   name: "錯誤日誌"
   description: "取得錯誤日誌(開發者專用)"
@@ -12,4 +40,3 @@ error_log:
     success: "錯誤發生於"
   hint_message: "糟糕！發生了錯誤。\n\
     請使用下方的按鈕與我們聯繫，並提供以下錯誤 ID：```{err_id}```"
-
