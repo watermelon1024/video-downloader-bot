@@ -8,6 +8,9 @@ download:
     video_format:
       name: "video-format"
       description: "Video fromat"
+    video_quality:
+      name: "video-quality"
+      description: "Video bitrate, ex: '5000' ('k' is not needed)"
     audio_format:
       name: "audio-format"
       description: "Audio format"

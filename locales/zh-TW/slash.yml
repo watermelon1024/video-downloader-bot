@@ -8,12 +8,15 @@ download:
     video_format:
       name: "影片格式"
       description: "影片格式"
+    video_quality:
+      name: "影片品質"
+      description: "影片比特率，例: '5000' (不需輸入'k')"
     audio_format:
       name: "音訊格式"
       description: "音訊格式"
     audio_quality:
       name: "音訊品質"
-      description: "音訊品質, 例: '192' (不需輸入'k')"
+      description: "音訊品質，例: '192' (不需輸入'k')"
     audio_only:
       name: "僅音訊"
       description: "僅下載音訊"

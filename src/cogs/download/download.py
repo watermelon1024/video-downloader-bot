@@ -6,6 +6,7 @@ import asyncio
 import os
 
 import discord
+import ffmpeg_downloader as ffdl
 import yt_dlp
 
 from src.client.i18n import I18n, bool_option, option, slash_command
@@ -23,6 +24,7 @@ class DownloadCog(BaseCog):
     @slash_command("download")
     @option("download", "url")
     @option("download", "video_format")
+    @option("download", "video_quality")
     @option("download", "audio_format")
     @option("download", "audio_quality")
     @bool_option("download", "audio_only")
@@ -32,6 +34,7 @@ class DownloadCog(BaseCog):
         ctx: discord.ApplicationContext,
         url: str,
         video_format: str = None,
+        video_quality: str = None,
         audio_format: str = None,
         audio_quality: str = None,
         audio_only: str = "false",
@@ -40,10 +43,13 @@ class DownloadCog(BaseCog):
         await ctx.defer()
 
         options = {"postprocessors": []}
-        if video_format:
-            options["postprocessors"].append(
-                {"key": "FFmpegVideoConvertor", "preferedformat": video_format}
-            )
+        if video_format or video_quality:
+            process = {"key": "FFmpegVideoConvertor"}
+            if video_format:
+                process["preferedformat"] = video_format
+            if video_quality:
+                process["custom_params"] = ["-b:v", f"{video_quality.removesuffix('k')}k"]
+            options["postprocessors"].append(process)
         if audio_format or audio_quality:
             process = {"key": "FFmpegExtractAudio"}
             if audio_format:
@@ -78,15 +84,12 @@ class Downloader:
         self.options["no_warnings"] = not self.bot.debug_mode
         self.options["verbose"] = self.bot.debug_mode
         self.options["cachedir"] = "storage/cache"
+        self.options["ffmpeg-location"] = ffdl.ffmpeg_path
         self.file_path = None
 
     def _hook(self, d):
         if d["status"] == "finished":
             self.file_path = d.get("filename") or d["info_dict"].get("filepath")
-            if self.file_path is None:
-                print(d)
-            else:
-                print(self.file_path)
 
     def _download(self):
         with yt_dlp.YoutubeDL(self.options) as ydl:
@@ -104,7 +107,13 @@ class Downloader:
             return
         size_in_bytes = os.path.getsize(self.file_path)
         if size_in_bytes > 25000000:  # 25MB
-            await self.ctx.respond(I18n.get("slash.download.response.too_large", self.ctx))
+            await self.ctx.respond(
+                I18n.get(
+                    "slash.download.response.too_large",
+                    self.ctx,
+                    size=f"{size_in_bytes/1000000:.2f}MB",
+                )
+            )
         else:
             await self.ctx.edit(
                 content=I18n.get("slash.download.response.success", self.ctx),
