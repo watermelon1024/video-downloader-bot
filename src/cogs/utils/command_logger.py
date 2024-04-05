@@ -2,8 +2,6 @@
 Cog module for the command logger.
 """
 
-import traceback
-import uuid
 
 import aiohttp
 import discord
@@ -101,10 +99,9 @@ class CmdLogger(BaseCog):
         """
         The event that is triggered when an application command error occurs.
         """
-        error_id = str(uuid.uuid4())
-        await self.db.new_error_log(error_id, "".join(traceback.format_exception(error)))
+        error_id = await self.db.new_error_log(error)
         await ctx.respond(
-            I18n.get("slash.error_log.hint_message", ctx, err_id=error_id),
+            I18n.get("slash.error_log.hint_message", ctx, err_id=str(error_id)),
             ephemeral=True,
         )
         self.logger.exception(type(error).__name__, exc_info=error)

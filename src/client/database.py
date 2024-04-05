@@ -2,6 +2,8 @@
 The database module of the bot.
 """
 
+import traceback
+import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -143,14 +145,23 @@ class Database:
             await db.commit()
             return
 
-    async def new_error_log(self, id: str, traceback: str) -> None:
+    async def new_error_log(self, exception: str | Exception) -> uuid.UUID:
         """
         Creates a new error log.
         """
-        return await self._insert(
+        await self._insert(
             "error_log",
-            {"id": id, "traceback": traceback, "timestamp": int(datetime.now().timestamp())},
+            {
+                "id": str(err_id := uuid.uuid4()),
+                "traceback": (
+                    exception
+                    if issubclass(exception, Exception)
+                    else "".join(traceback.format_exception(exception))
+                ),
+                "timestamp": int(datetime.now().timestamp()),
+            },
         )
+        return err_id
 
     async def get_error_log(self, err_id: str) -> aiosqlite.Row:
         """

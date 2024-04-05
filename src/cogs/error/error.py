@@ -2,6 +2,7 @@
 Cog module for the error commands.
 """
 
+import io
 import uuid
 
 import discord
@@ -43,7 +44,7 @@ class ErrorCog(BaseCog):
         if len(msg) + len(traceback) <= 1994:  # 2000 - 6(len of "`"*6)
             await ctx.respond(f"{msg}```{traceback}```")
         else:
-            await ctx.respond(file=discord.File(traceback, f"{err_uuid}.txt"))
+            await ctx.respond(file=discord.File(io.StringIO(traceback), f"{err_uuid}.txt"))
 
 
 def setup(bot: Bot) -> None:
