@@ -77,13 +77,13 @@ class Downloader:
         self.ctx = ctx
         self.url = url
         self.options = options or {}
-        self.options["outtmpl"] = "storage/%(title)s.%(ext)s"
+        self.options["outtmpl"] = ".cache/videos/%(title)s.%(ext)s"
         self.options["progress_hooks"] = [self._hook]
         self.options["postprocessor_hooks"] = [self._hook]
         self.options["quiet"] = not self.bot.debug_mode
         self.options["no_warnings"] = not self.bot.debug_mode
         self.options["verbose"] = self.bot.debug_mode
-        self.options["cachedir"] = "storage/cache"
+        self.options["cachedir"] = ".cache/ytdlp"
         self.options["ffmpeg-location"] = ffdl.ffmpeg_path
         self.file_path = None
 
