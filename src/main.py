@@ -10,6 +10,7 @@ import discord
 from discord.ext import commands
 
 from src.client.config import Config
+from src.client.database import Database
 from src.client.logging import InterceptHandler, Logging
 
 
@@ -32,6 +33,7 @@ class Bot(discord.AutoShardedBot):
             force=True,
         )
         self.log_webhook = log_webhook
+        self.database = Database(self.config["database"]["path"])
 
         intents = discord.Intents.default()
         intents.members = True
@@ -47,6 +49,7 @@ class Bot(discord.AutoShardedBot):
         """
         The event that is triggered when the bot is started.
         """
+        await self.database.initialize()
         self._uptime = discord.utils.utcnow()  # Store a timezone-aware datetime object
         self.logger.info(
             f"""
@@ -69,6 +72,7 @@ Guilds Count: {len(self.guilds)}
         self._client_ready = True
 
     async def close(self) -> None:
+        self.logger.enable("discord")
         return await super().close()
 
     @property
@@ -92,3 +96,7 @@ class BaseCog(commands.Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.logger = bot.logger
+
+    @property
+    def db(self):
+        return self.bot.database

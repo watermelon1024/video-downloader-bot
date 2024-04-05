@@ -1,0 +1,15 @@
+error_log:
+  name: "error-log"
+  description: "Get the error log (dev only)"
+  option:
+    err_id:
+      name: "id"
+      description: "The error ID"
+  response:
+    no_permission: "You can't run this command!"
+    invalid_id: "Invalid error ID formate."
+    not_found: "Error log not found."
+    success: "Error occurred at"
+  hint_message: "Oops! An error occurred.\n\
+    Please use the button below to contact us and provide the following error ID.```{err_id}```"
+

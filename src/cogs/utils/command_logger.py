@@ -2,6 +2,7 @@
 Cog module for the command logger.
 """
 
+import traceback
 import uuid
 
 import aiohttp
@@ -10,7 +11,6 @@ from discord.ext import commands, tasks
 
 from src.client.i18n import I18n
 from src.main import BaseCog, Bot
-from src.utils import const
 from src.utils.discord import get_user_name
 
 
@@ -102,11 +102,9 @@ class CmdLogger(BaseCog):
         The event that is triggered when an application command error occurs.
         """
         error_id = str(uuid.uuid4())
+        await self.db.new_error_log(error_id, "".join(traceback.format_exception(error)))
         await ctx.respond(
             I18n.get("slash.error_log.hint_message", ctx, err_id=error_id),
-            view=discord.ui.View(
-                discord.ui.Button(label="OuO Community", url=const.OUO_DISCORD_INVITE)
-            ),
             ephemeral=True,
         )
         self.logger.exception(type(error).__name__, exc_info=error)
@@ -118,7 +116,7 @@ class CmdLogger(BaseCog):
 
         buffer = "\n".join(self.log_buffer)
         self.log_buffer.clear()
-        if len(self.log_content) + len(buffer) > 1994:  # 2000 (max len) - 6 (code block markdown)
+        if len(self.log_content) + len(buffer) >= 1994:  # 2000 (max len) - 6 (code block markdown)
             self.log_content = buffer
             self.message_id = None
         else:

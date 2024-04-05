@@ -1,0 +1,15 @@
+error_log:
+  name: "錯誤日誌"
+  description: "取得錯誤日誌(開發者專用)"
+  option:
+    err_id:
+      name: "id"
+      description: "錯誤 ID"
+  response:
+    no_permission: "你沒有權限執行此指令"
+    invalid_id: "未知的錯誤 ID 格式"
+    not_found: "未找到錯誤日誌"
+    success: "錯誤發生於"
+  hint_message: "糟糕！發生了錯誤。\n\
+    請使用下方的按鈕與我們聯繫，並提供以下錯誤 ID：```{err_id}```"
+
