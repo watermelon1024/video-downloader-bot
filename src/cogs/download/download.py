@@ -4,6 +4,7 @@ Cog module for the download commands.
 
 import asyncio
 import os
+import subprocess
 
 import discord
 import ffmpeg_downloader as ffdl
@@ -43,13 +44,12 @@ class DownloadCog(BaseCog):
         await ctx.defer()
 
         options = {"postprocessors": []}
-        if video_format or video_quality:
-            process = {"key": "FFmpegVideoConvertor"}
-            if video_format:
-                process["preferedformat"] = video_format
-            if video_quality:
-                process["custom_params"] = ["-b:v", f"{video_quality.removesuffix('k')}k"]
-            options["postprocessors"].append(process)
+        if video_format:
+            options["postprocessors"].append(
+                {"key": "FFmpegVideoConvertor", "preferedformat": video_format}
+            )
+        if video_quality:
+            options["postprocessor_args"] = ["-b:v", f"{video_quality.removesuffix('k')}k"]
         if audio_format or audio_quality:
             process = {"key": "FFmpegExtractAudio"}
             if audio_format:
@@ -91,35 +91,50 @@ class Downloader:
         if d["status"] == "finished":
             self.file_path = d.get("filename") or d["info_dict"].get("filepath")
 
-    def _download(self):
+    async def _download(self):
         with yt_dlp.YoutubeDL(self.options) as ydl:
             ydl.download([self.url])
 
     async def run(self):
         await self.ctx.respond(I18n.get("slash.download.response.start", self.ctx))
         try:
-            self._download()
+            await self._download()
+            size_in_bytes = os.path.getsize(self.file_path)
+            if size_in_bytes > 25000000:  # 25MB
+                process = subprocess.run(
+                    [
+                        # fmt: off
+                        ffdl.ffprobe_path,
+                        "-v", "quiet",
+                        "-show_entries", "format=bit_rate",
+                        "-of", "default=noprint_wrappers=1:nokey=1",
+                        self.file_path,
+                        # fmt: on
+                    ],
+                    stderr=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                )
+                bitrate = int(process.stdout)
+                await self.ctx.edit(
+                    content=I18n.get(
+                        "slash.download.response.too_large",
+                        self.ctx,
+                        size=f"{size_in_bytes/1000000:.2f}MB",
+                        bitrate=f"{bitrate/1000:.2f}kbps",
+                    )
+                )
+            else:
+                await self.ctx.edit(
+                    content=I18n.get("slash.download.response.success", self.ctx),
+                    file=discord.File(self.file_path),
+                )
         except Exception as e:
             error_id = await self.bot.database.new_error_log(e)
-            await self.ctx.respond(
-                I18n.get("slash.download.response.error", self.ctx, err_id=str(error_id))
-            )
-            return
-        size_in_bytes = os.path.getsize(self.file_path)
-        if size_in_bytes > 25000000:  # 25MB
-            await self.ctx.respond(
-                I18n.get(
-                    "slash.download.response.too_large",
-                    self.ctx,
-                    size=f"{size_in_bytes/1000000:.2f}MB",
-                )
-            )
-        else:
             await self.ctx.edit(
-                content=I18n.get("slash.download.response.success", self.ctx),
-                file=discord.File(self.file_path),
+                content=I18n.get("slash.download.response.error", self.ctx, err_id=str(error_id))
             )
-        os.remove(self.file_path)
+        finally:
+            os.remove(self.file_path)
 
     @property
     def bot(self) -> Bot:

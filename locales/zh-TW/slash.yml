@@ -26,7 +26,7 @@ download:
   response:
     start: "下載中..."
     success: "下載成功！"
-    too_large: "檔案過太({size})，無法上傳。"
+    too_large: "檔案過太({size})，無法上傳，請嘗試降低比特率(當前: {bitrate})。"
     error: "下載失敗，錯誤 ID：```{err_id}```"
 
 error_log:

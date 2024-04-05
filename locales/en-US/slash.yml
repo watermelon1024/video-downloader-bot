@@ -26,7 +26,7 @@ download:
   response:
     start: "Downloading..."
     success: "Download Successfully!"
-    too_large: "File too too large({size}), cannot upload."
+    too_large: "File too too large({size}), cannot upload, please try to lower the bitrate(current: {bitrate})."
     error: "Download failed, error ID：```{err_id}```"
 
 error_log:
