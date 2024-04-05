@@ -90,7 +90,7 @@ class CmdLogger(BaseCog):
         """
         if isinstance(error, (commands.CommandNotFound, commands.NotOwner)):
             return
-        self.logger.exception(type(error).__name__, exc_info=error)
+        self.logger.exception(type(error).__name__)
 
     @discord.Cog.listener()
     async def on_application_command_error(
