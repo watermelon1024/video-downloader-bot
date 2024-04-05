@@ -155,7 +155,7 @@ class Database:
                 "id": str(err_id := uuid.uuid4()),
                 "traceback": (
                     exception
-                    if issubclass(exception, Exception)
+                    if issubclass(type(exception), Exception)
                     else "".join(traceback.format_exception(exception))
                 ),
                 "timestamp": int(datetime.now().timestamp()),
