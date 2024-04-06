@@ -69,7 +69,7 @@ class DownloadCog(BaseCog):
                 ],
             }
 
-        asyncio.create_task(self._run_handler(ctx, url, options))
+        await self._run_handler(ctx, url, options)
 
 
 class Downloader:
@@ -93,7 +93,9 @@ class Downloader:
 
     async def _download(self):
         with yt_dlp.YoutubeDL(self.options) as ydl:
-            ydl.download([self.url])
+            await (self.bot.loop or asyncio.get_event_loop()).run_in_executor(
+                None, lambda: ydl.download([self.url])
+            )
 
     async def run(self):
         await self.ctx.respond(I18n.get("slash.download.response.start", self.ctx))
