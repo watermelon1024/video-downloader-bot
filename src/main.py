@@ -3,10 +3,12 @@ The main module of the bot.
 """
 
 import logging
+import shutil
 import tracemalloc
 from typing import Optional
 
 import discord
+import ffmpeg_downloader as ffdl
 from discord.ext import commands
 
 from src.client.config import Config
@@ -35,6 +37,11 @@ class Bot(discord.AutoShardedBot):
         )
         self.log_webhook = log_webhook
         self.database = Database(self.config["database"]["path"])
+        self.ffmpeg = shutil.which("ffmpeg") or self.config["ffmpeg"]["path"] or ffdl.ffmpeg_path
+        self.ffprobe = (
+            shutil.which("ffprobe") or self.config["ffmpeg"]["ffprobe"] or ffdl.ffprobe_path
+        )
+        print(self.ffmpeg, self.ffprobe)
 
         intents = discord.Intents.default()
         super().__init__(owner_ids=self.config["bot"]["owners"], intents=intents)

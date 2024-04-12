@@ -8,3 +8,7 @@
 
 [database]
     path = "storage/database.db"
+
+[ffmpeg]
+    path = "" # ffmpeg executable path
+    ffprobe = "" # ffprobe executable path

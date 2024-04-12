@@ -7,7 +7,6 @@ import os
 import subprocess
 
 import discord
-import ffmpeg_downloader as ffdl
 import yt_dlp
 
 from src.client.i18n import I18n, bool_option, option, slash_command
@@ -84,7 +83,7 @@ class Downloader:
         self.options["no_warnings"] = not self.bot.debug_mode
         self.options["verbose"] = self.bot.debug_mode
         self.options["cachedir"] = ".cache/ytdlp"
-        self.options["ffmpeg-location"] = ffdl.ffmpeg_path
+        self.options["ffmpeg-location"] = self.bot.ffmpeg
         self.file_path = None
 
     def _hook(self, d):
@@ -106,7 +105,7 @@ class Downloader:
                 process = subprocess.run(
                     [
                         # fmt: off
-                        ffdl.ffprobe_path,
+                        self.bot.ffprobe,
                         "-v", "quiet",
                         "-show_entries", "format=bit_rate",
                         "-of", "default=noprint_wrappers=1:nokey=1",
